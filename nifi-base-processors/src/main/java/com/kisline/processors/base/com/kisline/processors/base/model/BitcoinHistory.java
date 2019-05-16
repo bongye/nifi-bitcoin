@@ -6,6 +6,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.Objects;
@@ -16,6 +17,7 @@ public class BitcoinHistory implements Serializable {
   private static final long serialVersionUID = -1;
 
   @XmlElement(name = "timestamp")
+  @XmlJavaTypeAdapter(ZonedDateTimeAdapter.class)
   @JsonProperty("timestamp")
   private ZonedDateTime timestamp;
 
@@ -87,5 +89,69 @@ public class BitcoinHistory implements Serializable {
         + ", usdVolume="
         + usdVolume
         + '}';
+  }
+
+  public ZonedDateTime getTimestamp() {
+    return timestamp;
+  }
+
+  public double getOpen() {
+    return open;
+  }
+
+  public double getClose() {
+    return close;
+  }
+
+  public double getHigh() {
+    return high;
+  }
+
+  public double getLow() {
+    return low;
+  }
+
+  public double getBtcVolume() {
+    return btcVolume;
+  }
+
+  public double getWeightedPrice() {
+    return weightedPrice;
+  }
+
+  public double getUsdVolume() {
+    return usdVolume;
+  }
+
+  public void setTimestamp(ZonedDateTime timestamp) {
+    this.timestamp = timestamp;
+  }
+
+  public void setOpen(double open) {
+    this.open = open;
+  }
+
+  public void setClose(double close) {
+    this.close = close;
+  }
+
+  public void setHigh(double high) {
+    this.high = high;
+  }
+
+  public void setLow(double low) {
+    this.low = low;
+  }
+
+  public void setBtcVolume(double btcVolume) {
+    this.btcVolume = btcVolume;
+  }
+
+  public void setWeightedPrice(double weightedPrice) {
+    this.weightedPrice = weightedPrice;
+  }
+
+  public void setUsdVolume(double usdVolume) {
+    this.usdVolume = usdVolume;
   }
 }
