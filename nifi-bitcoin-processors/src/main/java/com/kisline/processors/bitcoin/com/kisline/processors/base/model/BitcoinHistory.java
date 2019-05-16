@@ -1,4 +1,4 @@
-package com.kisline.processors.base.com.kisline.processors.base.model;
+package com.kisline.processors.bitcoin.com.kisline.processors.base.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

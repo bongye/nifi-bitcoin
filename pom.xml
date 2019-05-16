@@ -24,13 +24,13 @@
   </parent>
 
   <groupId>com.kisline</groupId>
-  <artifactId>processor3</artifactId>
+  <artifactId>nifi-bitcoin</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <modules>
-    <module>nifi-base-processors</module>
-    <module>nifi-base-nar</module>
+    <module>nifi-bitcoin-processors</module>
+    <module>nifi-bitcoin-nar</module>
   </modules>
 
   <properties>

@@ -1,4 +1,4 @@
-package com.kisline.processors.base;
+package com.kisline.processors.bitcoin;
 
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.processor.Relationship;

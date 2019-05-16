@@ -14,12 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.kisline.processors.base;
+package com.kisline.processors.bitcoin;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.kisline.processors.base.com.kisline.processors.base.model.BitcoinHistory;
+import com.kisline.processors.bitcoin.com.kisline.processors.base.model.BitcoinHistory;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.nifi.annotation.behavior.InputRequirement;
