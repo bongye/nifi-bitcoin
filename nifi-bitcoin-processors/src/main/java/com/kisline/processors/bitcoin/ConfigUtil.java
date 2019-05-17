@@ -27,7 +27,7 @@ public enum ConfigUtil {
           .name("output")
           .displayName("Output format")
           .description("Format of output FlowFiles")
-          .allowableValues("XML", "JSON", "ALL")
+          .allowableValues("XML", "JSON", "DB", "ALL")
           .defaultValue("ALL")
           .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
           .required(true)
