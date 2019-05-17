@@ -1,5 +1,6 @@
 package com.kisline.processors.bitcoin;
 
+import com.kisline.dbcp.HikariCPService;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.processor.Relationship;
 import org.apache.nifi.processor.util.StandardValidators;
@@ -32,17 +33,32 @@ public enum ConfigUtil {
           .required(true)
           .build();
 
+  public static final PropertyDescriptor DS_PROP =
+      new PropertyDescriptor.Builder()
+          .name("dbcp")
+          .displayName("Database Connection Pool")
+          .description("Database Connection Pool")
+          .identifiesControllerService(HikariCPService.class)
+          .required(true)
+          .build();
+
   // Relationship -> the states options for terminated situation
   public static final Relationship XML =
       new Relationship.Builder()
           .name("xml")
-          .description("Files process as JSON successfully routed here")
+          .description("Files process as XML successfully routed here")
           .build();
 
   public static final Relationship JSON =
       new Relationship.Builder()
           .name("json")
-          .description("Files process as XML successfully routed here")
+          .description("Files process as JSON successfully routed here")
+          .build();
+
+  public static final Relationship DB =
+      new Relationship.Builder()
+          .name("db")
+          .description("Files process as DB successfully routed here")
           .build();
 
   public static final Relationship FAILURE =
@@ -54,11 +70,13 @@ public enum ConfigUtil {
   static {
     List<PropertyDescriptor> properties = new ArrayList<>();
     properties.add(OUTPUT);
+    properties.add(DS_PROP);
     ConfigUtil.properties = Collections.unmodifiableList(properties);
 
     Set<Relationship> relationships = new HashSet<>();
     relationships.add(JSON);
     relationships.add(XML);
+    relationships.add(DB);
     relationships.add(FAILURE);
     ConfigUtil.relationships = Collections.unmodifiableSet(relationships);
   }

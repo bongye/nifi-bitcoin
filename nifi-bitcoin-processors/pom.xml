@@ -28,6 +28,17 @@
 
   <dependencies>
     <dependency>
+      <groupId>com.kisline</groupId>
+      <artifactId>nifi-dbcp-api</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>com.kisline</groupId>
+      <artifactId>nifi-dbcp</artifactId>
+      <version>1.0-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.apache.nifi</groupId>
       <artifactId>nifi-api</artifactId>
     </dependency>
@@ -70,6 +81,15 @@
     <dependency>
       <groupId>com.fasterxml.jackson.datatype</groupId>
       <artifactId>jackson-datatype-jsr310</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.derby</groupId>
+      <artifactId>derbyclient</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.derby</groupId>
+      <artifactId>derbynet</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

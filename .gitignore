@@ -29,3 +29,6 @@ target/
 
 ### VS Code ###
 .vscode/
+
+nifi-bitcoin-processors/test
+nifi-bitcoin-processors/derby.log

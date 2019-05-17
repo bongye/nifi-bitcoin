@@ -19,6 +19,7 @@ package com.kisline.processors.bitcoin;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.kisline.dbcp.HikariCPService;
 import com.kisline.processors.bitcoin.com.kisline.processors.base.model.BitcoinHistory;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
@@ -40,6 +41,9 @@ import org.apache.nifi.processor.io.OutputStreamCallback;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import java.io.*;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -72,7 +76,8 @@ public class BitcoinHistoryProcessor extends AbstractProcessor {
   private enum Output {
     ALL,
     JSON,
-    XML
+    XML,
+    DB
   };
 
   /*
@@ -80,6 +85,8 @@ public class BitcoinHistoryProcessor extends AbstractProcessor {
    * 여러 스레드가 동시에 같은 프로세스에서 진행되어도 중복되지 않고 변수를 사용할 수 있다.
    */
   private AtomicReference<Output> output = new AtomicReference<>();
+
+  private AtomicReference<PreparedStatement> stmt = new AtomicReference<>();
 
   @Override
   protected void init(final ProcessorInitializationContext context) {
@@ -120,6 +127,20 @@ public class BitcoinHistoryProcessor extends AbstractProcessor {
   public void onScheduled(final ProcessContext context) {
     final String output = context.getProperty(ConfigUtil.OUTPUT).getValue();
     this.output.set(Output.valueOf(output));
+
+    HikariCPService dbcpService =
+        (HikariCPService) context.getProperty(ConfigUtil.DS_PROP).asControllerService();
+    try {
+
+      final PreparedStatement stmt =
+          dbcpService
+              .getConnection()
+              .prepareStatement(
+                  "insert into bitcoin_history (history_time, open_price, high, low, closed_price, btc_volume, usd_volume, weighted_price) values (?, ?, ?, ?, ?, ?, ?, ?)");
+      this.stmt.set(stmt);
+    } catch (ProcessException | SQLException e) {
+      getLogger().error("Could not create PreparedStatement", e);
+    }
   }
 
   @Override
@@ -133,11 +154,13 @@ public class BitcoinHistoryProcessor extends AbstractProcessor {
 
     final AtomicInteger jsonCounter = new AtomicInteger();
     final AtomicInteger xmlCounter = new AtomicInteger();
+    final AtomicInteger dbCounter = new AtomicInteger();
     final AtomicInteger recordsCounter = new AtomicInteger();
 
     // thread safe set efficient 하지 않지만.
     final Set<BitcoinHistory> jsonRecords = ConcurrentHashMap.newKeySet();
     final Set<BitcoinHistory> xmlRecords = ConcurrentHashMap.newKeySet();
+    final Set<BitcoinHistory> dbRecords = ConcurrentHashMap.newKeySet();
     final AtomicBoolean success = new AtomicBoolean(true);
 
     // csv 에는 많은 junk data 존재함
@@ -164,6 +187,10 @@ public class BitcoinHistoryProcessor extends AbstractProcessor {
                   if (isOutputXml()) {
                     xmlRecords.add(history);
                   }
+
+                  if (isOutputDb()) {
+                    dbRecords.add(history);
+                  }
                 }
               }
             } catch (Exception e) {
@@ -179,6 +206,10 @@ public class BitcoinHistoryProcessor extends AbstractProcessor {
 
     if (isOutputXml()) {
       writeXml(session, flowFile, xmlRecords, xmlCounter);
+    }
+
+    if (isOutputDb()) {
+      writeDb(dbRecords, dbCounter);
     }
 
     session.adjustCounter(ConfigUtil.RECORDS_READ, recordsCounter.get(), true);
@@ -202,6 +233,10 @@ public class BitcoinHistoryProcessor extends AbstractProcessor {
 
   private boolean isOutputXml() {
     return output.get() == Output.ALL || output.get() == Output.XML;
+  }
+
+  private boolean isOutputDb() {
+    return output.get() == Output.ALL || output.get() == Output.DB;
   }
 
   private BitcoinHistory createModel(final CSVRecord record) {
@@ -312,6 +347,28 @@ public class BitcoinHistoryProcessor extends AbstractProcessor {
       session.transfer(updatedFlowFile, ConfigUtil.XML);
 
       getLogger().debug("Wrote {} to XML", new Object[] {history});
+    }
+  }
+
+  private void writeDb(final Set<BitcoinHistory> dbRecords, final AtomicInteger count) {
+    final PreparedStatement stmt = this.stmt.get();
+    try {
+      for (BitcoinHistory history : dbRecords) {
+        stmt.setTimestamp(1, Timestamp.from(history.getTimestamp().toInstant()));
+        stmt.setDouble(2, history.getOpen());
+        stmt.setDouble(3, history.getHigh());
+        stmt.setDouble(4, history.getLow());
+        stmt.setDouble(5, history.getClose());
+        stmt.setDouble(6, history.getBtcVolume());
+        stmt.setDouble(7, history.getUsdVolume());
+        stmt.setDouble(8, history.getWeightedPrice());
+
+        stmt.execute();
+        count.incrementAndGet();
+        getLogger().debug("Wrote {} to DB", new Object[] {history});
+      }
+    } catch (Exception e) {
+      getLogger().error("Could not insert into DB", e);
     }
   }
 
