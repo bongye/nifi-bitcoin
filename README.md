@@ -11,9 +11,9 @@ New Project > Maven > Create from archetype > Add archetype ...
 * repository = http://repo.maven.apache.org/maven2/archetype-catalog.xml
 * Need to set artifactBaseName as bitcoin
 
-## Cloud instance setup
+## Cloud Instance Setup
 * Install JDK
-* Setup ACG to open port 8080
+* Setup ACG to open port 8080(for NiFi), 5050(for pgadmin4)
 * Download NiFi - http://apache.mirror.cdnetworks.com/nifi/1.9.2/nifi-1.9.2-bin.tar.gz
 * Unzip NiFi
 * Copy nifi-bitcoin-nar.jar to nifi-1.9.2/lib
