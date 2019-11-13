@@ -36,7 +36,7 @@
   <properties>
     <commons.csv.version>1.6</commons.csv.version>
     <jaxb.version>2.3.0.1</jaxb.version>
-    <jackson.version>2.9.8</jackson.version>
+    <jackson.version>2.10.1</jackson.version>
     <derby.version>10.14.2.0</derby.version>
   </properties>
 
